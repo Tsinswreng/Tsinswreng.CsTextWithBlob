@@ -4,7 +4,7 @@ using Tsinswreng.CsTreeTest;
 namespace Tsinswreng.CsTextWithBlob.Test.TextWithBlobCases;
 
 /// <summary>
-/// Tests for <see cref="Tsinswreng.CsTextWithBlob.TextWithBlob.Parse(ReadOnlyMemory{byte})"/>.
+/// Tests for <see cref="Tsinswreng.CsTextWithBlob.TextWithMemory.Parse(ReadOnlyMemory{byte})"/>.
 /// </summary>
 public partial class TestTextWithBlob {
 	/// <summary>
@@ -14,8 +14,8 @@ public partial class TestTextWithBlob {
 	public void RegisterParse(ITestNode Node) {
 		var register = Node.MkTestFnRegister(
 			typeof(TestTextWithBlob),
-			[typeof(Tsinswreng.CsTextWithBlob.TextWithBlob)],
-			[nameof(Tsinswreng.CsTextWithBlob.TextWithBlob.Parse)],
+			[typeof(Tsinswreng.CsTextWithBlob.TextWithMemory)],
+			[nameof(Tsinswreng.CsTextWithBlob.TextWithMemory.Parse)],
 			"Parse:"
 		);
 		var r = register.Register;
@@ -24,16 +24,16 @@ public partial class TestTextWithBlob {
 			const string text = "hello中";
 			var blob = new byte[] { 0x10, 0x20, 0x30 };
 			var data = BuildPacketBytes(text, blob);
-			var actual = Tsinswreng.CsTextWithBlob.TextWithBlob.Parse(data);
+			var actual = Tsinswreng.CsTextWithBlob.TextWithMemory.Parse(data);
 			AssertEqual(text, actual.Text, "Parse/valid/text");
 			AssertBytesEqual(blob, actual.Blob, "Parse/valid/blob");
 			return null;
 		});
 
 		r("throws when data is shorter than header", async _ => {
-			var invalid = new byte[Tsinswreng.CsTextWithBlob.TextWithBlob.HeaderLen - 1];
+			var invalid = new byte[Tsinswreng.CsTextWithBlob.TextWithMemory.HeaderLen - 1];
 			try {
-				_ = Tsinswreng.CsTextWithBlob.TextWithBlob.Parse(invalid);
+				_ = Tsinswreng.CsTextWithBlob.TextWithMemory.Parse(invalid);
 				throw new Exception("Expected ArgumentException but parsing succeeded.");
 			} catch(ArgumentException) {
 				// Expected path.
@@ -42,12 +42,12 @@ public partial class TestTextWithBlob {
 		});
 
 		r("throws when text bytes are incomplete", async _ => {
-			var invalid = new byte[Tsinswreng.CsTextWithBlob.TextWithBlob.HeaderLen + 2];
-			BinaryPrimitives.WriteUInt64BigEndian(invalid.AsSpan(0, Tsinswreng.CsTextWithBlob.TextWithBlob.HeaderLen), 5UL);
-			invalid[Tsinswreng.CsTextWithBlob.TextWithBlob.HeaderLen] = (byte)'a';
-			invalid[Tsinswreng.CsTextWithBlob.TextWithBlob.HeaderLen + 1] = (byte)'b';
+			var invalid = new byte[Tsinswreng.CsTextWithBlob.TextWithMemory.HeaderLen + 2];
+			BinaryPrimitives.WriteUInt64BigEndian(invalid.AsSpan(0, Tsinswreng.CsTextWithBlob.TextWithMemory.HeaderLen), 5UL);
+			invalid[Tsinswreng.CsTextWithBlob.TextWithMemory.HeaderLen] = (byte)'a';
+			invalid[Tsinswreng.CsTextWithBlob.TextWithMemory.HeaderLen + 1] = (byte)'b';
 			try {
-				_ = Tsinswreng.CsTextWithBlob.TextWithBlob.Parse(invalid);
+				_ = Tsinswreng.CsTextWithBlob.TextWithMemory.Parse(invalid);
 				throw new Exception("Expected ArgumentException but parsing succeeded.");
 			} catch(ArgumentException) {
 				// Expected path.

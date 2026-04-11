@@ -4,7 +4,7 @@ using Tsinswreng.CsTreeTest;
 namespace Tsinswreng.CsTextWithBlob.Test.TextWithBlobCases;
 
 /// <summary>
-/// Tests for <see cref="ExtnTextWithBlob.WriteTo{TSelf}(TSelf, IBufferWriter{byte})"/>.
+/// Tests for <see cref="ExtnTextWithMemory.WriteTo{TSelf}(TSelf, IBufferWriter{byte})"/>.
 /// </summary>
 public partial class TestTextWithBlob {
 	/// <summary>
@@ -14,14 +14,14 @@ public partial class TestTextWithBlob {
 	public void RegisterWriteTo(ITestNode Node) {
 		var register = Node.MkTestFnRegister(
 			typeof(TestTextWithBlob),
-			[typeof(ExtnTextWithBlob)],
-			[nameof(ExtnTextWithBlob.WriteTo)],
+			[typeof(ExtnTextWithMemory)],
+			[nameof(ExtnTextWithMemory.WriteTo)],
 			"WriteTo:"
 		);
 		var r = register.Register;
 
 		r("writes identical bytes as ToByteArr and returns same instance", async _ => {
-			var packed = Tsinswreng.CsTextWithBlob.TextWithBlob.Pack("中", new byte[] { 0x07, 0x08 });
+			var packed = Tsinswreng.CsTextWithBlob.TextWithMemory.Pack("中", new byte[] { 0x07, 0x08 });
 			var writer = new ArrayBufferWriter<byte>();
 			var returned = packed.WriteTo(writer);
 			if(!ReferenceEquals(packed, returned)) {
@@ -32,7 +32,7 @@ public partial class TestTextWithBlob {
 		});
 
 		r("appends to an existing writer position", async _ => {
-			var packed = Tsinswreng.CsTextWithBlob.TextWithBlob.Pack("ok", new byte[] { 0x01 });
+			var packed = Tsinswreng.CsTextWithBlob.TextWithMemory.Pack("ok", new byte[] { 0x01 });
 			var writer = new ArrayBufferWriter<byte>();
 			var prefix = writer.GetSpan(1);
 			prefix[0] = 0xFF;

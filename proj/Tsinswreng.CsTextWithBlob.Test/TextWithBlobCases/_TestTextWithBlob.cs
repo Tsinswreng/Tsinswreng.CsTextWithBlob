@@ -4,7 +4,7 @@ using Tsinswreng.CsTreeTest;
 namespace Tsinswreng.CsTextWithBlob.Test.TextWithBlobCases;
 
 /// <summary>
-/// Main tester of <see cref="Tsinswreng.CsTextWithBlob.TextWithBlob"/> and <see cref="ExtnTextWithBlob"/>.
+/// Main tester of <see cref="Tsinswreng.CsTextWithBlob.TextWithMemory"/> and <see cref="ExtnTextWithMemory"/>.
 /// Each partial file registers tests for one target function.
 /// </summary>
 public partial class TestTextWithBlob : ITester {
@@ -60,7 +60,7 @@ public partial class TestTextWithBlob : ITester {
 	/// <param name="Blob">Binary payload.</param>
 	/// <returns>Serialized full packet bytes.</returns>
 	protected static byte[] BuildPacketBytes(string Text, ReadOnlyMemory<byte> Blob) {
-		return Tsinswreng.CsTextWithBlob.TextWithBlob.Pack(Text, Blob).ToByteArr();
+		return Tsinswreng.CsTextWithBlob.TextWithMemory.Pack(Text, Blob).ToByteArr();
 	}
 
 	/// <summary>

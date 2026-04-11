@@ -5,21 +5,21 @@ using System.Buffers;
 using System.Text;
 
 
-public partial class TextWithBlob: ITextWithBlob{
+public partial class TextWithMemory: ITextWithMemory{
 	public u64 HeaderBytesLen{get;set;}
 	public string Text { get;set;}
 	public ReadOnlyMemory<byte> Blob { get;set;}
-	public TextWithBlob(str Text, ReadOnlyMemory<byte> Blob){
+	public TextWithMemory(str Text, ReadOnlyMemory<byte> Blob){
 		this.HeaderBytesLen = (u64)Encoding.UTF8.GetByteCount(Text);
 		this.Text = Text;
 		this.Blob = Blob;
 	}
-	public static partial TextWithBlob Pack(string Text, ReadOnlyMemory<byte> Blob){
-		return new TextWithBlob(Text, Blob);
+	public static partial TextWithMemory Pack(string Text, ReadOnlyMemory<byte> Blob){
+		return new TextWithMemory(Text, Blob);
 	}
 	#region --- 解包 ---
 	/// 从完整的数据块解析，成功返回实例，否则抛 ArgumentException。
-	public static partial TextWithBlob Parse(ReadOnlyMemory<byte> Data){
+	public static partial TextWithMemory Parse(ReadOnlyMemory<byte> Data){
 		if (Data.Length < HeaderLen){
 			throw new ArgumentException("数据长度不足 8 字节头部");
 		}
@@ -34,20 +34,20 @@ public partial class TextWithBlob: ITextWithBlob{
 		string text = Encoding.UTF8.GetString(Data.Span.Slice(HeaderLen, textByteCount));
 		ReadOnlyMemory<byte> binary = Data.Slice(totalNeed);
 
-		return new TextWithBlob(text, binary);
+		return new TextWithMemory(text, binary);
 	}
 
 	#endregion
 }
 
-public static partial class ExtnTextWithBlob {
-	public const i32 HeaderLen = TextWithBlob.HeaderLen;
+public static partial class ExtnTextWithMemory {
+	public const i32 HeaderLen = TextWithMemory.HeaderLen;
 
 	#region --- 打包 ---
 	
 	public static partial byte[] ToByteArr<TSelf>(
 		this TSelf z
-	)where TSelf:ITextWithBlob{
+	)where TSelf:ITextWithMemory{
 		i32 textByteCount = (i32)z.HeaderBytesLen;//.ToInt();
 		u64 total = HeaderLen + (u64)textByteCount + (u64)z.Blob.Length;
 		byte[] arr = new byte[total];
@@ -66,7 +66,7 @@ public static partial class ExtnTextWithBlob {
 	public static partial TSelf WriteTo<TSelf>(
 		this TSelf z
 		,IBufferWriter<byte> Writer
-	)where TSelf:ITextWithBlob
+	)where TSelf:ITextWithMemory
 	{
 		//int textByteCount = Encoding.UTF8.GetByteCount(z.Text);
 		i32 textByteCount = (i32)z.HeaderBytesLen;//.ToInt();
