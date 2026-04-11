@@ -37,27 +37,6 @@ public partial class TextWithBlob: ITextWithBlob{
 		return new TextWithBlob(text, binary);
 	}
 
-	public static partial TextWithBlob? TryParse(ref ReadOnlySequence<byte> Buffer){
-		if (Buffer.Length < HeaderLen){
-			return null;
-		}
-
-		ulong textByteCountU = System.Buffers.Binary.BinaryPrimitives.ReadUInt64BigEndian(Buffer.FirstSpan.Slice(0, HeaderLen));
-
-		int textByteCount = checked((int)textByteCountU);
-		long totalNeed = HeaderLen + textByteCount;
-		if (Buffer.Length < totalNeed){
-			return null;
-		}
-
-		// 长度足够，真正消费
-		var seq = Buffer.Slice(0, totalNeed);
-		string text = Encoding.UTF8.GetString(seq.Slice(HeaderLen, textByteCount));
-		ReadOnlyMemory<byte> binary = seq.Slice(totalNeed).ToArray(); // 这里 ToArray 可换成 Pool 复用
-
-		Buffer = Buffer.Slice(totalNeed);
-		return new TextWithBlob(text, binary);
-	}
 	#endregion
 }
 

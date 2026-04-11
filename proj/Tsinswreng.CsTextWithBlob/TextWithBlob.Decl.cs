@@ -16,9 +16,6 @@ public partial class TextWithBlob{
 	
 	public static partial TextWithBlob Pack(string Text, ReadOnlyMemory<byte> Blob);
 	public static partial TextWithBlob Parse(ReadOnlyMemory<byte> Data);
-	/// 尝试从缓冲区头部解析一个包，如果长度不足返回 null，且不消耗缓冲区。
-	/// 适合先收几个字节再判断的场景。
-	public static partial TextWithBlob? TryParse(ref ReadOnlySequence<byte> Buffer);
 }
 
 
