@@ -8,11 +8,11 @@ using System.Text;
 public partial class TextWithMemory: ITextWithMemory{
 	public u64 HeaderBytesLen{get;set;}
 	public string Text { get;set;}
-	public ReadOnlyMemory<byte> Blob { get;set;}
+	public ReadOnlyMemory<byte> Memory { get;set;}
 	public TextWithMemory(str Text, ReadOnlyMemory<byte> Blob){
 		this.HeaderBytesLen = (u64)Encoding.UTF8.GetByteCount(Text);
 		this.Text = Text;
-		this.Blob = Blob;
+		this.Memory = Blob;
 	}
 	public static partial TextWithMemory Pack(string Text, ReadOnlyMemory<byte> Blob){
 		return new TextWithMemory(Text, Blob);
@@ -49,7 +49,7 @@ public static partial class ExtnTextWithMemory {
 		this TSelf z
 	)where TSelf:ITextWithMemory{
 		i32 textByteCount = (i32)z.HeaderBytesLen;//.ToInt();
-		u64 total = HeaderLen + (u64)textByteCount + (u64)z.Blob.Length;
+		u64 total = HeaderLen + (u64)textByteCount + (u64)z.Memory.Length;
 		byte[] arr = new byte[total];
 
 		// 写头（固定小端）
@@ -58,7 +58,7 @@ public static partial class ExtnTextWithMemory {
 		// 写 text
 		Encoding.UTF8.GetBytes(z.Text, arr.AsSpan(HeaderLen, textByteCount));
 		// 写 binary
-		z.Blob.CopyTo(arr.AsMemory(HeaderLen + textByteCount));
+		z.Memory.CopyTo(arr.AsMemory(HeaderLen + textByteCount));
 		return arr;
 	}
 
@@ -70,7 +70,7 @@ public static partial class ExtnTextWithMemory {
 	{
 		//int textByteCount = Encoding.UTF8.GetByteCount(z.Text);
 		i32 textByteCount = (i32)z.HeaderBytesLen;//.ToInt();
-		Span<byte> span = Writer.GetSpan(HeaderLen + textByteCount + z.Blob.Length);
+		Span<byte> span = Writer.GetSpan(HeaderLen + textByteCount + z.Memory.Length);
 
 		// header
 		System.Buffers.Binary.BinaryPrimitives.WriteUInt64BigEndian(span, (ulong)textByteCount);
@@ -81,9 +81,9 @@ public static partial class ExtnTextWithMemory {
 		span = span.Slice(textByteCount);
 
 		// binary
-		z.Blob.Span.CopyTo(span);
+		z.Memory.Span.CopyTo(span);
 
-		Writer.Advance(HeaderLen + textByteCount + z.Blob.Length);
+		Writer.Advance(HeaderLen + textByteCount + z.Memory.Length);
 		return z;
 	}
 	#endregion

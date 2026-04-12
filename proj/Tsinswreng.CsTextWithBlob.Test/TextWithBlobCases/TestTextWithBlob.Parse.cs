@@ -26,7 +26,7 @@ public partial class TestTextWithBlob {
 			var data = BuildPacketBytes(text, blob);
 			var actual = Tsinswreng.CsTextWithBlob.TextWithMemory.Parse(data);
 			AssertEqual(text, actual.Text, "Parse/valid/text");
-			AssertBytesEqual(blob, actual.Blob, "Parse/valid/blob");
+			AssertBytesEqual(blob, actual.Memory, "Parse/valid/blob");
 			return null;
 		});
 

@@ -7,7 +7,7 @@ using System.Text;
 public interface ITextWithMemory{
 	public u64 HeaderBytesLen{get;set;}
 	public string Text { get;set;}
-	public ReadOnlyMemory<byte> Blob { get;set;}
+	public ReadOnlyMemory<byte> Memory { get;set;}
 }
 
 

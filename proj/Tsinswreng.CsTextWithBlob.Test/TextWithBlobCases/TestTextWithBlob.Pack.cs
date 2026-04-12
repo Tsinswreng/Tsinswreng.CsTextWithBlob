@@ -27,7 +27,7 @@ public partial class TestTextWithBlob {
 			ulong expectedHeaderBytesLen = (ulong)Encoding.UTF8.GetByteCount(text);
 			AssertEqual(expectedHeaderBytesLen, actual.HeaderBytesLen, "Pack/header-byte-len");
 			AssertEqual(text, actual.Text, "Pack/text");
-			AssertBytesEqual(blob, actual.Blob, "Pack/blob");
+			AssertBytesEqual(blob, actual.Memory, "Pack/blob");
 			return null;
 		});
 
@@ -35,7 +35,7 @@ public partial class TestTextWithBlob {
 			const string text = "hello";
 			var actual = Tsinswreng.CsTextWithBlob.TextWithMemory.Pack(text, ReadOnlyMemory<byte>.Empty);
 			AssertEqual((ulong)Encoding.UTF8.GetByteCount(text), actual.HeaderBytesLen, "Pack/empty/header-byte-len");
-			AssertEqual(0, actual.Blob.Length, "Pack/empty/blob-len");
+			AssertEqual(0, actual.Memory.Length, "Pack/empty/blob-len");
 			return null;
 		});
 	}
