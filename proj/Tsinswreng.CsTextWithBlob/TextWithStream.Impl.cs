@@ -40,6 +40,17 @@ public partial class TextWithStream : ITextWithStream {
 			Payload = Payload
 		};
 	}
+	
+	public static partial TextWithStream PackUtf8(
+		string Text,
+		Stream Payload
+	){
+		return Pack(
+			(u64)Encoding.UTF8.GetByteCount(Text),
+			Text,
+			Payload
+		);
+	}
 
 	/// <summary>
 	/// Parse one packet from stream: 8-byte big-endian text length, UTF-8 text, and the remaining bytes as payload.
