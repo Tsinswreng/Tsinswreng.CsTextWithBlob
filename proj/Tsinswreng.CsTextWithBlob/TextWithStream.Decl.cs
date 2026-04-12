@@ -1,3 +1,4 @@
+using System.Text;
 using Tsinswreng.CsCore;
 
 namespace Tsinswreng.CsTextWithBlob;
@@ -23,6 +24,12 @@ public partial class TextWithStream{
 	public partial TextWithStream();
 	public static partial TextWithStream Pack(
 		u64 HeaderBytesLen,
+		string Text,
+		Stream Payload
+	);
+	
+	[Doc(@$"{nameof(ITextWithStream.HeaderBytesLen)} auto set to  bytes count of {nameof(Text)} in UTF8 encoding.")]
+	public static partial TextWithStream PackUtf8(
 		string Text,
 		Stream Payload
 	);
