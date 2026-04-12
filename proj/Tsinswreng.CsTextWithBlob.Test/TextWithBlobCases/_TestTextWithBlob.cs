@@ -19,7 +19,6 @@ public partial class TestTextWithBlob : ITester {
 		Node.IsParallelRecursive = false;
 		RegisterPack(Node);
 		RegisterParse(Node);
-		RegisterTryParse(Node);
 		RegisterToByteArr(Node);
 		RegisterWriteTo(Node);
 		return Node;

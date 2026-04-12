@@ -1,5 +1,6 @@
 using Tsinswreng.CsTreeTest;
 using Tsinswreng.CsTextWithBlob.Test.TextWithBlobCases;
+using Tsinswreng.CsTextWithBlob.Test.TextWithStreamCases;
 
 namespace Tsinswreng.CsTextWithBlob.Test;
 
@@ -17,6 +18,7 @@ public class TextWithBlobTestMgr : DiEtTestMgr {
 	public override ITestNode RegisterTestsInto(ITestNode? Test) {
 		Test = this.TestNode;
 		this.RegisterTester<TestTextWithBlob>();
+		this.RegisterTester<TestTextWithStream>();
 		return Test;
 	}
 }
