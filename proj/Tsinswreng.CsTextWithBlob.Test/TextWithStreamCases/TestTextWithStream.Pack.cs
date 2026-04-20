@@ -4,7 +4,7 @@ using Tsinswreng.CsTreeTest;
 namespace Tsinswreng.CsTextWithBlob.Test.TextWithStreamCases;
 
 /// <summary>
-/// Tests for <see cref="Tsinswreng.CsTextWithBlob.TextWithStream.Pack(ulong, string, Stream)"/>.
+/// Tests for <see cref="Tsinswreng.CsTextWithBlob.TextWithStream.Mk(ulong, string, Stream)"/>.
 /// </summary>
 public partial class TestTextWithStream {
 	/// <summary>
@@ -14,7 +14,7 @@ public partial class TestTextWithStream {
 		var register = Node.MkTestFnRegister(
 			typeof(TestTextWithStream),
 			[typeof(Tsinswreng.CsTextWithBlob.TextWithStream)],
-			[nameof(Tsinswreng.CsTextWithBlob.TextWithStream.Pack)],
+			[nameof(Tsinswreng.CsTextWithBlob.TextWithStream.Mk)],
 			"TextWithStream.Pack:"
 		);
 		var r = register.Register;
@@ -23,7 +23,7 @@ public partial class TestTextWithStream {
 			const string text = "A中";
 			var payload = new MemoryStream(new byte[] { 0x01, 0x02 });
 			var headerLen = (ulong)Encoding.UTF8.GetByteCount(text);
-			var packed = Tsinswreng.CsTextWithBlob.TextWithStream.Pack(headerLen, text, payload);
+			var packed = Tsinswreng.CsTextWithBlob.TextWithStream.Mk(headerLen, text, payload);
 			AssertEqual(headerLen, packed.HeaderBytesLen, "Pack/header");
 			AssertEqual(text, packed.Text, "Pack/text");
 			if(!ReferenceEquals(payload, packed.Payload)) {
@@ -35,7 +35,7 @@ public partial class TestTextWithStream {
 		r("throws when header length mismatches text bytes", async _ => {
 			const string text = "中";
 			try {
-				_ = Tsinswreng.CsTextWithBlob.TextWithStream.Pack(1UL, text, new MemoryStream());
+				_ = Tsinswreng.CsTextWithBlob.TextWithStream.Mk(1UL, text, new MemoryStream());
 				throw new Exception("Expected ArgumentException but Pack succeeded.");
 			} catch(ArgumentException) {
 				// expected

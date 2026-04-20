@@ -22,17 +22,23 @@ public partial class TextWithStream{
 	public string Text {get;set;}
 	public Stream Payload {get;set;}
 	public partial TextWithStream();
-	public static partial TextWithStream Pack(
+	public static partial TextWithStream Mk(
 		u64 HeaderBytesLen,
 		string Text,
 		Stream Payload
 	);
 	
 	[Doc(@$"{nameof(ITextWithStream.HeaderBytesLen)} auto set to  bytes count of {nameof(Text)} in UTF8 encoding.")]
-	public static partial TextWithStream PackUtf8(
+	public static partial TextWithStream MkUtf8(
 		string Text,
 		Stream Payload
 	);
 	public static partial TextWithStream Unpack(Stream stream);
 	
+}
+
+public static partial class ExtnTextWithStream{
+	extension(TextWithStream z){
+		public partial Stream ToStream();
+	}
 }

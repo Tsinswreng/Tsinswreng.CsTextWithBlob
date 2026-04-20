@@ -19,7 +19,7 @@ public partial class TextWithStream : ITextWithStream {
 	/// <returns>Packet object for later serialization/processing.</returns>
 	/// <exception cref="ArgumentNullException">Thrown when <paramref name="Payload"/> is null.</exception>
 	/// <exception cref="ArgumentException">Thrown when header byte length does not match UTF-8 byte count of text.</exception>
-	public static partial TextWithStream Pack(
+	public static partial TextWithStream Mk(
 		u64 HeaderBytesLen,
 		string Text,
 		Stream Payload
@@ -41,11 +41,11 @@ public partial class TextWithStream : ITextWithStream {
 		};
 	}
 	
-	public static partial TextWithStream PackUtf8(
+	public static partial TextWithStream MkUtf8(
 		string Text,
 		Stream Payload
 	){
-		return Pack(
+		return Mk(
 			(u64)Encoding.UTF8.GetByteCount(Text),
 			Text,
 			Payload
