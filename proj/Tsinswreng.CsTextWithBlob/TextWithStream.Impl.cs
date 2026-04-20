@@ -10,9 +10,7 @@ public partial class TextWithStream : ITextWithStream {
 		Payload = Stream.Null;
 	}
 
-	/// <summary>
 	/// Build a packet object from already-prepared fields.
-	/// </summary>
 	/// <param name="HeaderBytesLen">UTF-8 byte length of <paramref name="Text"/>.</param>
 	/// <param name="Text">Text part.</param>
 	/// <param name="Payload">Remaining payload stream.</param>
@@ -52,11 +50,9 @@ public partial class TextWithStream : ITextWithStream {
 		);
 	}
 
-	/// <summary>
 	/// Parse one packet from stream: 8-byte big-endian text length, UTF-8 text, and the remaining bytes as payload.
-	/// </summary>
 	/// <param name="stream">Input packet stream.</param>
-	/// <returns>Parsed packet with payload copied into a readable memory stream.</returns>
+	/// <returns>Parsed packet with payload as the remaining part of <paramref name="stream"/> (no copy).</returns>
 	/// <exception cref="ArgumentNullException">Thrown when <paramref name="stream"/> is null.</exception>
 	/// <exception cref="ArgumentException">Thrown when stream content is shorter than required header/text bytes.</exception>
 	/// <exception cref="OverflowException">Thrown when text length cannot fit into <see cref="int"/>.</exception>
@@ -82,14 +78,103 @@ public partial class TextWithStream : ITextWithStream {
 
 		string text = Encoding.UTF8.GetString(textBytes);
 
-		var payloadMs = new MemoryStream();
-		stream.CopyTo(payloadMs);
-		payloadMs.Position = 0;
-
 		return new TextWithStream {
 			HeaderBytesLen = textByteCountU,
 			Text = text,
-			Payload = payloadMs
+			Payload = stream
 		};
+	}
+}
+
+public static partial class ExtnTextWithStream {
+	/// Serialize packet to stream as: 8-byte big-endian text length + UTF-8 text bytes + payload bytes.
+	/// <returns>A readable memory stream positioned at start.</returns>
+	/// <exception cref="ArgumentNullException">Thrown when <see cref="TextWithStream.Payload"/> is null.</exception>
+	/// <exception cref="ArgumentException">Thrown when <see cref="TextWithStream.HeaderBytesLen"/> does not match UTF-8 byte count of <see cref="TextWithStream.Text"/>.</exception>
+	public static partial Stream ToStream(this ITextWithStream z) {
+		if(z.Payload is null) {
+			throw new ArgumentNullException(nameof(z.Payload));
+		}
+
+		var text = z.Text ?? string.Empty;
+		byte[] textBytes = Encoding.UTF8.GetBytes(text);
+		ulong expected = (ulong)textBytes.Length;
+		if(z.HeaderBytesLen != expected) {
+			throw new ArgumentException(
+				$"{nameof(z.HeaderBytesLen)} ({z.HeaderBytesLen}) does not match UTF-8 byte count ({expected}).",
+				nameof(z.HeaderBytesLen)
+			);
+		}
+
+		byte[] headAndText = new byte[8 + textBytes.Length];
+		BinaryPrimitives.WriteUInt64BigEndian(headAndText.AsSpan(0, 8), z.HeaderBytesLen);
+		textBytes.CopyTo(headAndText.AsSpan(8));
+		var prefix = new MemoryStream(headAndText, writable: false);
+
+		if(z.Payload.CanSeek) {
+			z.Payload.Position = 0;
+		}
+		return new ChainedReadStream(prefix, z.Payload);
+	}
+}
+
+file sealed class ChainedReadStream : Stream {
+	private readonly Stream _first;
+	private readonly Stream _second;
+	private bool _firstDone;
+	private long _position;
+
+	public ChainedReadStream(Stream first, Stream second) {
+		_first = first ?? throw new ArgumentNullException(nameof(first));
+		_second = second ?? throw new ArgumentNullException(nameof(second));
+	}
+
+	public override bool CanRead => true;
+	public override bool CanSeek => false;
+	public override bool CanWrite => false;
+	public override long Length => throw new NotSupportedException();
+	public override long Position {
+		get => _position;
+		set => throw new NotSupportedException();
+	}
+
+	public override int Read(byte[] buffer, int offset, int count) {
+		return Read(buffer.AsSpan(offset, count));
+	}
+
+	public override int Read(Span<byte> buffer) {
+		if(buffer.Length == 0) {
+			return 0;
+		}
+
+		int totalRead = 0;
+		if(!_firstDone) {
+			int r1 = _first.Read(buffer);
+			totalRead += r1;
+			if(r1 == buffer.Length) {
+				_position += totalRead;
+				return totalRead;
+			}
+			_firstDone = r1 == 0 || _first.Position >= _first.Length;
+			buffer = buffer.Slice(r1);
+		}
+		if(buffer.Length > 0) {
+			int r2 = _second.Read(buffer);
+			totalRead += r2;
+		}
+		_position += totalRead;
+		return totalRead;
+	}
+
+	public override void Flush() => throw new NotSupportedException();
+	public override long Seek(long offset, SeekOrigin origin) => throw new NotSupportedException();
+	public override void SetLength(long value) => throw new NotSupportedException();
+	public override void Write(byte[] buffer, int offset, int count) => throw new NotSupportedException();
+
+	protected override void Dispose(bool disposing) {
+		if(disposing) {
+			_first.Dispose();
+		}
+		base.Dispose(disposing);
 	}
 }

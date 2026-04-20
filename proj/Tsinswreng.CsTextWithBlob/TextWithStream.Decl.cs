@@ -38,7 +38,5 @@ public partial class TextWithStream{
 }
 
 public static partial class ExtnTextWithStream{
-	extension(TextWithStream z){
-		public partial Stream ToStream();
-	}
+	public static partial Stream ToStream(this ITextWithStream z);
 }

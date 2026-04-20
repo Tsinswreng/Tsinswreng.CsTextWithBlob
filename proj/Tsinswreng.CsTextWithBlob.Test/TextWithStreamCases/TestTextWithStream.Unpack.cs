@@ -24,6 +24,9 @@ public partial class TestTextWithStream {
 			var unpacked = Tsinswreng.CsTextWithBlob.TextWithStream.Unpack(input);
 			AssertEqual("abc中", unpacked.Text, "Unpack/text");
 			AssertEqual((ulong)System.Text.Encoding.UTF8.GetByteCount("abc中"), unpacked.HeaderBytesLen, "Unpack/header");
+			if(!ReferenceEquals(input, unpacked.Payload)) {
+				throw new Exception("Case 'Unpack/payload-ref' failed. Payload should reuse source stream.");
+			}
 			var payloadBytes = ReadAllBytes(unpacked.Payload);
 			if(!payloadBytes.AsSpan().SequenceEqual(new byte[] { 0xAA, 0xBB, 0xCC })) {
 				throw new Exception("Case 'Unpack/payload' failed. Payload bytes mismatch.");

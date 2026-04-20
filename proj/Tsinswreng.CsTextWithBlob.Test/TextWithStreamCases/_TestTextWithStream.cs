@@ -18,6 +18,7 @@ public partial class TestTextWithStream : ITester {
 		Node.Ordered = false;
 		Node.IsParallelRecursive = false;
 		RegisterPack(Node);
+		RegisterToStream(Node);
 		RegisterUnpack(Node);
 		return Node;
 	}
