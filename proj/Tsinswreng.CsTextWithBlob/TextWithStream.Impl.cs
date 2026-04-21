@@ -84,6 +84,50 @@ public partial class TextWithStream : ITextWithStream {
 			Payload = stream
 		};
 	}
+
+	public static async partial Task<TextWithStream> UnpackAsy(Stream stream, CT Ct) {
+		if(stream is null) {
+			throw new ArgumentNullException(nameof(stream));
+		}
+
+		var header = new byte[8];
+		int readHead = await ReadAtLeastAsy(stream, header.AsMemory(), 8, Ct);
+		if(readHead < 8) {
+			throw new ArgumentException("Stream does not contain full 8-byte header.", nameof(stream));
+		}
+
+		ulong textByteCountU = BinaryPrimitives.ReadUInt64BigEndian(header);
+		int textByteCount = checked((int)textByteCountU);
+
+		var textBytes = new byte[textByteCount];
+		int readText = await ReadAtLeastAsy(stream, textBytes.AsMemory(), textByteCount, Ct);
+		if(readText < textByteCount) {
+			throw new ArgumentException("Stream does not contain full text bytes.", nameof(stream));
+		}
+
+		string text = Encoding.UTF8.GetString(textBytes);
+
+		return new TextWithStream {
+			HeaderBytesLen = textByteCountU,
+			Text = text,
+			Payload = stream
+		};
+	}
+
+	private static async Task<int> ReadAtLeastAsy(Stream stream, Memory<byte> buffer, int minimumBytes, CT Ct) {
+		if(minimumBytes <= 0) {
+			return 0;
+		}
+		int totalRead = 0;
+		while(totalRead < minimumBytes) {
+			int n = await stream.ReadAsync(buffer.Slice(totalRead), Ct);
+			if(n == 0) {
+				break;
+			}
+			totalRead += n;
+		}
+		return totalRead;
+	}
 }
 
 public static partial class ExtnTextWithStream {

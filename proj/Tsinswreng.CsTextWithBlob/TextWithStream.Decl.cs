@@ -34,6 +34,7 @@ public partial class TextWithStream{
 		Stream Payload
 	);
 	public static partial TextWithStream Unpack(Stream stream);
+	public static partial Task<TextWithStream> UnpackAsy(Stream stream, CT Ct = default);
 	
 }
 
