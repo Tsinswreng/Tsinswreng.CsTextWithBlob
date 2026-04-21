@@ -2,13 +2,9 @@ using Tsinswreng.CsTreeTest;
 
 namespace Tsinswreng.CsTextWithBlob.Test.TextWithStreamCases;
 
-/// <summary>
 /// Tests for <see cref="Tsinswreng.CsTextWithBlob.TextWithStream.Unpack(Stream)"/>.
-/// </summary>
 public partial class TestTextWithStream {
-	/// <summary>
 	/// Register all cases for Unpack.
-	/// </summary>
 	public void RegisterUnpack(ITestNode Node) {
 		var register = Node.MkTestFnRegister(
 			typeof(TestTextWithStream),
