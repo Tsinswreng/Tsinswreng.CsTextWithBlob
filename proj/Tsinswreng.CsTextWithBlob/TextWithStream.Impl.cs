@@ -85,7 +85,7 @@ public partial class TextWithStream : ITextWithStream {
 		};
 	}
 
-	public static async partial Task<TextWithStream> UnpackAsy(Stream stream, CT Ct) {
+	public static async partial Task<TextWithStream> Unpack(Stream stream, CT Ct) {
 		if(stream is null) {
 			throw new ArgumentNullException(nameof(stream));
 		}
