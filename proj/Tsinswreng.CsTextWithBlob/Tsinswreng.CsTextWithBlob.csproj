@@ -1,9 +1,19 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
 	<PropertyGroup>
 		<TargetFramework>net10.0</TargetFramework>
 		<ImplicitUsings>enable</ImplicitUsings>
 		<Nullable>enable</Nullable>
+		<PackageId>Tsinswreng.CsTextWithBlob</PackageId>
+		<Version>0.0.1-alpha</Version>
+		<Authors>Tsinswreng</Authors>
+		<Description>Pack UTF-8 text plus binary payload into a simple framed memory or stream format.</Description>
+		<PackageTags>Binary;Stream;UTF8;Serialization</PackageTags>
+		<PackageReadmeFile>README.md</PackageReadmeFile>
 	</PropertyGroup>
+
+	<ItemGroup>
+		<None Include="..\..\README.md" Pack="true" PackagePath="\" />
+	</ItemGroup>
 
 </Project>
